@@ -5,13 +5,15 @@ pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const zig_js_module = b.addModule("zig-js", .{ .root_source_file = b.path("src/main.zig") });
-
-    const test_exe = b.addTest(.{
-        .name = "js-test",
+    const zig_js_module = b.addModule("zig-js", .{
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
+    });
+
+    const test_exe = b.addTest(.{
+        .name = "js-test",
+        .root_module = zig_js_module,
     });
     b.installArtifact(test_exe);
 
@@ -23,12 +25,14 @@ pub fn build(b: *std.Build) !void {
     {
         const wasm = b.addExecutable(.{
             .name = "example",
-            .root_source_file = b.path("example/main.zig"),
-            .target = b.resolveTargetQuery(.{
-                .cpu_arch = .wasm32,
-                .os_tag = .freestanding,
+            .root_module = b.createModule(.{
+                .root_source_file = b.path("example/main.zig"),
+                .target = b.resolveTargetQuery(.{
+                    .cpu_arch = .wasm32,
+                    .os_tag = .freestanding,
+                }),
+                .optimize = optimize,
             }),
-            .optimize = optimize,
         });
         wasm.root_module.addImport("zig-js", zig_js_module);
         wasm.entry = .disabled;
