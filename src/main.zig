@@ -16,11 +16,15 @@
 //! "ref" to identify a JS value. It differs greatly in other areas since
 //! Zig doesn't have a runtime and doesn't behave anything like Go.
 
-const object = @import("object.zig");
-const value = @import("value.zig");
-pub usingnamespace object;
-pub usingnamespace value;
-pub usingnamespace @import("ref.zig");
+pub const value = @import("value.zig");
+pub const ref = @import("ref.zig");
+
+pub const Object = @import("Object.zig");
+pub const String = value.String;
+pub const Undefined = value.Undefined;
+pub const Value = value.Value;
+pub const Type = ref.Type;
+pub const Ref = ref.Ref;
 
 /// Errors that can occur in this package.
 pub const Error = error{
@@ -32,16 +36,16 @@ pub const Error = error{
 
 /// The global "this" value as the high-level Object API. You can access
 /// the lower level Value API by using "Value.global" directly.
-pub const global: object.Object = .{ .value = .global };
+pub const global: Object = .{ .value = .global };
 
 /// The runtime value is the "this" value for the ZigJS class in JS.
 /// This is useful to directly accessing the WebAssembly.Memory property
 /// to implement things like JS-to-WASM memcpy.
-pub const runtime: object.Object = .{ .value = .runtime };
+pub const runtime: Object = .{ .value = .runtime };
 
 /// Shortcut for String.init since this is a common operation.
-pub inline fn string(v: anytype) value.String {
-    return value.String.init(v);
+pub inline fn string(v: anytype) String {
+    return String.init(v);
 }
 
 test {

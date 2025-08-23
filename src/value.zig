@@ -3,7 +3,11 @@ const builtin = @import("builtin");
 const assert = std.debug.assert;
 const Allocator = std.mem.Allocator;
 const js = @import("main.zig");
-const ext = @import("extern.zig");
+
+const ext = if (builtin.is_test)
+    @import("extern/mock.zig")
+else
+    @import("extern.zig");
 
 /// Only used with Value.init to denote a string type.
 ///
